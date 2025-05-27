@@ -8,6 +8,10 @@
     "dockerfile": "Dockerfile"
   },
 
+  "initializeCommand": "docker network inspect settheory_local_network > /dev/null || docker network create settheory_local_network --attachable",
+
+  "runArgs": [ "--network", "settheory_local_network", "--hostname", "settheory-api-local" ],
+
   // Features to add to the dev container. More info: https://containers.dev/features.
   // "features": {},
 
