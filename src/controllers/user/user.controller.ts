@@ -19,15 +19,15 @@ export class UserController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserWithIdentityDto) {
-    const { user, identity } = createUserDto;
+    const { firstName, lastName, email, dateOfBirth, identity } = createUserDto;
 
     // Call the service to create a user with identity
     const userId = await this._userService.createUserWithIdentity(
       {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        dateOfBirth: user.dateOfBirth,
+        firstName,
+        lastName,
+        email,
+        dateOfBirth,
       },
       identity,
     );

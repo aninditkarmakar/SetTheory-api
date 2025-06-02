@@ -1,18 +1,44 @@
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsEmail,
+  IsISO8601,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { AuthProvider } from 'src/enums/AuthProvider';
 
-export class CreateUserWithIdentityDto {
-  user: {
-    firstName: string;
-    lastName?: string;
-    email?: string;
-    dateOfBirth?: Date;
-  };
+export class CreateIdentityDto {
+  @IsNotEmpty()
+  @IsString()
+  providerId: string;
 
-  identity: {
-    providerId: string;
-    authProvider: AuthProvider;
-  };
+  @IsNotEmpty()
+  @Min(0)
+  authProvider: AuthProvider;
+}
+
+export class CreateUserWithIdentityDto {
+  @IsNotEmpty()
+  @IsString()
+  firstName: string;
+
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsISO8601({ strict: true })
+  dateOfBirth?: Date;
+
+  @IsNotEmpty()
+  @Type(() => CreateIdentityDto)
+  identity: CreateIdentityDto;
 }
 
 export class GetUserByIdDto {
