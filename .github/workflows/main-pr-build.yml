@@ -1,0 +1,33 @@
+name: main branch PR build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'prisma/schema.prisma'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/main-pr-build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup environment variables
+        env:
+          NEON_POSTGRES_DEV_DB_CONNECTION_STRING: ${{ secrets.NEON_POSTGRES_DEV_DB_CONNECTION_STRING }}
+        run: scripts/setup-env.sh
+
+      - name: Build with Node 24.0.2
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.0.2
+          cache: 'npm'
+      - run: npm install
+      - run: npx prisma db pull
+      - run: npx prisma generate
+      - run: npm run build

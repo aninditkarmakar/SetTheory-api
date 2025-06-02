@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model databasechangelog {
+  id            String   @db.VarChar(255)
+  author        String   @db.VarChar(255)
+  filename      String   @db.VarChar(255)
+  dateexecuted  DateTime @db.Timestamp(6)
+  orderexecuted Int
+  exectype      String   @db.VarChar(10)
+  md5sum        String?  @db.VarChar(35)
+  description   String?  @db.VarChar(255)
+  comments      String?  @db.VarChar(255)
+  tag           String?  @db.VarChar(255)
+  liquibase     String?  @db.VarChar(20)
+  contexts      String?  @db.VarChar(255)
+  labels        String?  @db.VarChar(255)
+  deployment_id String?  @db.VarChar(10)
+
+  @@ignore
+}
+
+model databasechangeloglock {
+  id          Int       @id
+  locked      Boolean
+  lockgranted DateTime? @db.Timestamp(6)
+  lockedby    String?   @db.VarChar(255)
+}
+
+model Identity {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String   @db.Uuid
+  provider_id   String   @db.VarChar(50)
+  auth_provider Int      @db.SmallInt
+  created_at    DateTime @default(now()) @db.Timestamp(6)
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_identity_user_user_id")
+
+  @@index([provider_id, user_id], map: "idx_identity_provider_id_user_id")
+  @@map("identity")
+}
+
+model User {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  first_name    String     @db.VarChar(30)
+  last_name     String?    @db.VarChar(50)
+  email         String?    @db.VarChar(50)
+  date_of_birth DateTime?  @db.Date
+  created_at    DateTime   @default(now()) @db.Timestamp(6)
+  modified_at   DateTime   @default(now()) @db.Timestamp(6)
+  identities    Identity[]
+
+  @@index([email], map: "idx_user_email")
+  @@map("user")
+}
