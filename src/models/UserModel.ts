@@ -1,23 +1,16 @@
-export interface User {
+export interface UserModel {
   id: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  dateOfBirth: Date;
+  firstName: string;
+  lastName: string | null;
+  email: string | null;
+  dateOfBirth: Date | null;
   createdAt: Date;
-  updatedAt: Date;
+  modifiedAt: Date;
 }
 
-export type UserCreateInput = {
-  firstname?: string;
-  lastname?: string;
+export interface UserModelCreateInput {
+  firstName: string;
+  lastName?: string;
   email?: string;
   dateOfBirth?: Date;
-};
-
-export type UserUpdateInput = {
-  firstname?: string;
-  lastname?: string;
-  email?: string;
-  dateOfBirth?: Date;
-};
+}

@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from 'prisma/generated/prisma';
 
+// The IPrismaClientProviderToken is used for dependency injection
+export const IPrismaClientProviderToken = 'IPrismaClientProvider';
+export interface IPrismaClientProvider {
+  getPrismaClient(): PrismaClient;
+}
+
 @Injectable()
-export class PrismaClientProvider {
+export class PrismaClientService implements IPrismaClientProvider {
   private readonly prismaClient: PrismaClient;
 
   public constructor() {

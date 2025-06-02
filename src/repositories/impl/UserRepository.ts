@@ -1,29 +1,37 @@
-import { Identity, PrismaClient, User } from 'prisma/generated/prisma';
+import { PrismaClient } from 'prisma/generated/prisma';
 import { IUserRepository } from '../IUserRepository';
-import { PrismaClientProvider } from 'src/providers/PrismaClientProvider';
+import {
+  IPrismaClientProvider,
+  IPrismaClientProviderToken,
+} from 'src/services/PrismaClientService';
+import { UserModel, UserModelCreateInput } from 'src/models/UserModel';
+import { IdentityModelCreateInput } from 'src/models/IdentityModel';
+import { Inject } from '@nestjs/common';
 
 export class UserRepository implements IUserRepository {
   private readonly _prisma: PrismaClient;
 
-  public constructor(prismaProvider: PrismaClientProvider) {
+  public constructor(
+    @Inject(IPrismaClientProviderToken) prismaProvider: IPrismaClientProvider,
+  ) {
     this._prisma = prismaProvider.getPrismaClient();
   }
 
   public async createUserWithIdentity(
-    user: User,
-    identity: Identity,
+    user: UserModelCreateInput,
+    identity: IdentityModelCreateInput,
   ): Promise<string> {
     const result = await this._prisma.user.create({
       data: {
-        first_name: user.first_name,
-        last_name: user.last_name,
+        first_name: user.firstName,
+        last_name: user.lastName,
         email: user.email,
-        date_of_birth: user.date_of_birth,
+        date_of_birth: user.dateOfBirth,
         identities: {
           create: [
             {
-              provider_id: identity.provider_id,
-              auth_provider: identity.auth_provider,
+              provider_id: identity.providerId,
+              auth_provider: identity.authProvider,
             },
           ],
         },
@@ -33,11 +41,27 @@ export class UserRepository implements IUserRepository {
     return result.id;
   }
 
-  public async getUserById(userId: string): Promise<User | null> {
-    return await this._prisma.user.findUnique({
+  public async getUserById(userId: string): Promise<UserModel | null> {
+    const dbUser = await this._prisma.user.findUnique({
       where: {
         id: userId,
       },
     });
+
+    if (!dbUser) {
+      return null;
+    }
+
+    const userModel: UserModel = {
+      id: dbUser.id,
+      firstName: dbUser.first_name,
+      lastName: dbUser.last_name,
+      email: dbUser.email,
+      dateOfBirth: dbUser.date_of_birth,
+      createdAt: dbUser.created_at,
+      modifiedAt: dbUser.modified_at,
+    };
+
+    return userModel;
   }
 }

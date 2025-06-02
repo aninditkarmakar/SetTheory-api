@@ -1,6 +1,12 @@
-import { Identity, User } from 'prisma/generated/prisma';
+import { IdentityModelCreateInput } from 'src/models/IdentityModel';
+import { UserModel, UserModelCreateInput } from 'src/models/UserModel';
 
+// The IUserRepositoryToken is used for dependency injection
+export const IUserRepositoryToken = 'IUserRepository';
 export interface IUserRepository {
-  createUserWithIdentity(user: User, identity: Identity): Promise<string>;
-  getUserById(userId: string): Promise<User | null>;
+  createUserWithIdentity(
+    user: UserModelCreateInput,
+    identity: IdentityModelCreateInput,
+  ): Promise<string>;
+  getUserById(userId: string): Promise<UserModel | null>;
 }
