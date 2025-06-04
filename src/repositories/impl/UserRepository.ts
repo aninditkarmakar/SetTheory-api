@@ -7,6 +7,7 @@ import {
 import { UserModel, UserModelCreateInput } from 'src/models/UserModel';
 import { IdentityModelCreateInput } from 'src/models/IdentityModel';
 import { Inject } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 
 export class UserRepository implements IUserRepository {
   private readonly _prisma: PrismaClient;
@@ -20,7 +21,7 @@ export class UserRepository implements IUserRepository {
   public async createUserWithIdentity(
     user: UserModelCreateInput,
     identity: IdentityModelCreateInput,
-  ): Promise<string> {
+  ): Promise<UserModel> {
     const result = await this._prisma.user.create({
       data: {
         first_name: user.firstName,
@@ -38,7 +39,7 @@ export class UserRepository implements IUserRepository {
       },
     });
 
-    return result.id;
+    return plainToInstance(UserModel, result);
   }
 
   public async getUserById(userId: string): Promise<UserModel | null> {

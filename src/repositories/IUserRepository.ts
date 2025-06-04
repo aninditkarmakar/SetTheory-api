@@ -7,6 +7,6 @@ export interface IUserRepository {
   createUserWithIdentity(
     user: UserModelCreateInput,
     identity: IdentityModelCreateInput,
-  ): Promise<string>;
+  ): Promise<UserModel>;
   getUserById(userId: string): Promise<UserModel | null>;
 }

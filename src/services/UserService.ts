@@ -10,7 +10,7 @@ export interface IUserService {
   createUserWithIdentity(
     user: UserModelCreateInput,
     identity: IdentityModelCreateInput,
-  ): Promise<string>;
+  ): Promise<UserModel>;
   getUserById(userId: string): Promise<UserModel | null>;
 }
 
@@ -24,7 +24,7 @@ export class UserService implements IUserService {
   public async createUserWithIdentity(
     user: UserModelCreateInput,
     identity: IdentityModelCreateInput,
-  ): Promise<string> {
+  ): Promise<UserModel> {
     return this._userRepository.createUserWithIdentity(user, identity);
   }
 

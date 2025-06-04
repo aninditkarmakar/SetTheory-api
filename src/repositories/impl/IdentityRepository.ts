@@ -6,6 +6,7 @@ import {
 } from 'src/services/PrismaClientService';
 import { IdentityModel } from 'src/models/IdentityModel';
 import { Inject } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 
 export class IdentityRepository implements IIdentityRepository {
   private readonly _prisma: PrismaClient;
@@ -30,22 +31,6 @@ export class IdentityRepository implements IIdentityRepository {
       return null;
     }
 
-    const identityModel: IdentityModel = {
-      id: dbIdentity.id,
-      providerId: dbIdentity.provider_id,
-      authProvider: dbIdentity.auth_provider,
-      createdAt: dbIdentity.created_at,
-      user: {
-        id: dbIdentity.user.id,
-        firstName: dbIdentity.user.first_name,
-        lastName: dbIdentity.user.last_name,
-        email: dbIdentity.user.email,
-        dateOfBirth: dbIdentity.user.date_of_birth,
-        createdAt: dbIdentity.user.created_at,
-        modifiedAt: dbIdentity.user.modified_at,
-      },
-    };
-
-    return identityModel;
+    return plainToInstance(IdentityModel, dbIdentity);
   }
 }
