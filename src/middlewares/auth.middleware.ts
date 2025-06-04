@@ -1,0 +1,41 @@
+import { NestMiddleware, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Request, Response, NextFunction } from 'express';
+import { OAuth2Client } from 'google-auth-library';
+import { SignInRequestDto } from 'src/controllers/auth/auth.dto';
+import { AuthProvider } from 'src/enums/AuthProvider';
+import { AuthProviderInfo, AuthService } from 'src/services/AuthService';
+
+export type SignInRequest = Request<unknown, unknown, SignInRequestDto> & {
+  providerInfo?: AuthProviderInfo;
+};
+
+export class SignInMiddleware implements NestMiddleware {
+  private _googleClient: OAuth2Client;
+
+  public constructor(
+    private readonly _configService: ConfigService,
+    private readonly _authService: AuthService,
+  ) {
+    this._googleClient = new OAuth2Client(
+      this._configService.get<string>('GOOGLE_CLIENT_ID'),
+    );
+  }
+
+  public async use(req: SignInRequest, res: Response, next: NextFunction) {
+    try {
+      if (req.body.authProvider === AuthProvider.Google) {
+        req.providerInfo = await this._authService.verifyGoogleToken(
+          req.body.providerToken,
+        );
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e: any) {
+      throw new UnauthorizedException(
+        `Token verification failed. Provider: ${req.body.authProvider}`,
+      );
+    }
+
+    next();
+  }
+}

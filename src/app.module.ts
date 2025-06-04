@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {
@@ -11,6 +11,7 @@ import { IIdentityRepositoryToken } from './repositories/IIdentityRepository';
 import { IdentityRepository } from './repositories/impl/IdentityRepository';
 import { IUserServiceToken, UserService } from './services/UserService';
 import { UserController } from './controllers/user/user.controller';
+import { SignInMiddleware } from './middlewares/auth.middleware';
 
 @Module({
   imports: [],
@@ -43,4 +44,8 @@ import { UserController } from './controllers/user/user.controller';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SignInMiddleware).forRoutes('auth/sign-in');
+  }
+}
