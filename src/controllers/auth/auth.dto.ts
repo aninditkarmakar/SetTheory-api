@@ -7,15 +7,15 @@ import { PartialExisting } from 'src/utilities/utilityTypes';
 export class SignInRequestDto {
   @IsNotEmpty()
   @IsString()
-  providerId: string;
+  provider_id: string;
 
   @IsNotEmpty()
   @IsNumber()
-  authProvider: AuthProvider;
+  auth_provider: AuthProvider;
 
   @IsNotEmpty()
   @IsString()
-  providerToken: string;
+  provider_token: string;
 }
 
 export class SignInResponseDto {
