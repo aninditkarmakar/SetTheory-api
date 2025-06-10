@@ -20,14 +20,14 @@ export class AuthController {
   public async signIn(
     @Req() signInRequest: SignInRequest,
   ): Promise<SignInResponseDto> {
-    const { providerToken, authProvider } = signInRequest.body;
-    console.log(`Provider Token: `, providerToken);
+    const { provider_token, auth_provider } = signInRequest.body;
+    console.log(`Provider Token: `, provider_token);
 
-    if (authProvider === AuthProvider.Google) {
-      return await this._authService.performGoogleSignIn(providerToken);
+    if (auth_provider === AuthProvider.Google) {
+      return await this._authService.performGoogleSignIn(provider_token);
     } else {
       throw new BadRequestException(
-        `Unsupported auth provider: ${authProvider}`,
+        `Unsupported auth provider: ${auth_provider}`,
       );
     }
   }

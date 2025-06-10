@@ -31,15 +31,15 @@ export class SignInMiddleware implements NestMiddleware {
 
   public async use(req: SignInRequest, res: Response, next: NextFunction) {
     try {
-      if (req.body.authProvider === AuthProvider.Google) {
+      if (req.body.auth_provider === AuthProvider.Google) {
         req.providerInfo = await this._authService.verifyGoogleToken(
-          req.body.providerToken,
+          req.body.provider_token,
         );
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e: any) {
       throw new UnauthorizedException(
-        `Token verification failed. Provider: ${req.body.authProvider}`,
+        `Token verification failed. Provider: ${req.body.auth_provider}`,
       );
     }
 
