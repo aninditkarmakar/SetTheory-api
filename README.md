@@ -16,7 +16,6 @@ Populate the environment variables as necessary.
 Then run the following commands to have Prisma generate the Prisma Client API classes.
 
 ```bash
-npx prisma db pull
 npx prisma generate
 ```
 

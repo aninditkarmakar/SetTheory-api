@@ -12,21 +12,25 @@ import { AuthProvider } from 'src/enums/AuthProvider';
 export class CreateIdentityDto {
   @IsNotEmpty()
   @IsString()
-  providerId: string;
+  provider_id: string;
 
   @IsNotEmpty()
   @Min(0)
-  authProvider: AuthProvider;
+  auth_provider: AuthProvider;
+
+  constructor(partial: Partial<CreateIdentityDto>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class CreateUserWithIdentityDto {
   @IsNotEmpty()
   @IsString()
-  firstName: string;
+  first_name: string;
 
   @IsOptional()
   @IsString()
-  lastName?: string;
+  last_name?: string;
 
   @IsOptional()
   @IsEmail()
@@ -34,25 +38,34 @@ export class CreateUserWithIdentityDto {
 
   @IsOptional()
   @IsISO8601({ strict: true })
-  dateOfBirth?: Date;
+  date_of_birth?: Date;
 
   @IsNotEmpty()
   @Type(() => CreateIdentityDto)
   identity: CreateIdentityDto;
+
+  constructor(partial: Partial<GetUserByIdDto>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class GetUserByIdDto {
   id: string;
-  firstName: string;
-  lastName: string | null;
+
+  first_name: string;
+
+  last_name: string | null;
+
   email: string | null;
 
   @Transform(({ value }: { value: Date | null }) =>
     value && value instanceof Date ? value.toISOString().split('T')[0] : null,
   )
-  dateOfBirth: Date | null;
-  createdAt: Date;
-  modifiedAt: Date;
+  date_of_birth: Date | null;
+
+  created_at: Date;
+
+  modified_at: Date;
 
   constructor(partial: Partial<GetUserByIdDto>) {
     Object.assign(this, partial);
