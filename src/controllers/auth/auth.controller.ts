@@ -1,34 +1,34 @@
-import { Inject, Post, Req } from '@nestjs/common';
 import {
-  IIdentityService,
-  IIdentityServiceToken,
-} from 'src/services/IdentityService';
-import { IUserService, IUserServiceToken } from 'src/services/UserService';
-import { OAuth2Client } from 'google-auth-library';
-import { ConfigService } from '@nestjs/config';
+  BadRequestException,
+  Controller,
+  Inject,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { SignInRequest } from 'src/middlewares/auth.middleware';
 import { AuthProvider } from 'src/enums/AuthProvider';
-import { AuthService } from 'src/services/AuthService';
+import { AuthService, IAuthServiceToken } from 'src/services/AuthService';
+import { SignInResponseDto } from './auth.dto';
 
+@Controller()
 export class AuthController {
-  private _googleClient: OAuth2Client;
   public constructor(
-    @Inject(IUserServiceToken) private readonly _userService: IUserService,
-    @Inject(IIdentityServiceToken)
-    private readonly _identityService: IIdentityService,
-    private readonly _configService: ConfigService,
-    private readonly _authService: AuthService,
-  ) {
-    this._googleClient = new OAuth2Client(
-      this._configService.get<string>('GOOGLE_CLIENT_ID'),
-    );
-  }
+    @Inject(IAuthServiceToken) private readonly _authService: AuthService,
+  ) {}
 
   @Post('auth/sign-in')
-  public async signIn(@Req() signInRequest: SignInRequest) {
+  public async signIn(
+    @Req() signInRequest: SignInRequest,
+  ): Promise<SignInResponseDto> {
     const { providerToken, authProvider } = signInRequest.body;
+    console.log(`Provider Token: `, providerToken);
+
     if (authProvider === AuthProvider.Google) {
       return await this._authService.performGoogleSignIn(providerToken);
+    } else {
+      throw new BadRequestException(
+        `Unsupported auth provider: ${authProvider}`,
+      );
     }
   }
 }

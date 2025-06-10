@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IdentityModelCreateInput } from 'src/models/IdentityModel';
-import { UserModel, UserModelCreateInput } from 'src/models/UserModel';
+import { Prisma, User } from 'prisma/generated/prisma';
 import { UserRepository } from 'src/repositories/impl/UserRepository';
 import { IUserRepositoryToken } from 'src/repositories/IUserRepository';
 
@@ -8,10 +7,11 @@ import { IUserRepositoryToken } from 'src/repositories/IUserRepository';
 export const IUserServiceToken = 'IUserService';
 export interface IUserService {
   createUserWithIdentity(
-    user: UserModelCreateInput,
-    identity: IdentityModelCreateInput,
-  ): Promise<UserModel>;
-  getUserById(userId: string): Promise<UserModel | null>;
+    user: Prisma.UserCreateWithoutIdentitiesInput,
+    identity: Prisma.IdentityCreateWithoutUserInput,
+  ): Promise<User>;
+
+  getUserById(userId: string): Promise<User | null>;
 }
 
 @Injectable()
@@ -22,13 +22,13 @@ export class UserService implements IUserService {
   ) {}
 
   public async createUserWithIdentity(
-    user: UserModelCreateInput,
-    identity: IdentityModelCreateInput,
-  ): Promise<UserModel> {
+    user: Prisma.UserCreateWithoutIdentitiesInput,
+    identity: Prisma.IdentityCreateWithoutUserInput,
+  ): Promise<User> {
     return this._userRepository.createUserWithIdentity(user, identity);
   }
 
-  public async getUserById(userId: string): Promise<UserModel | null> {
+  public async getUserById(userId: string): Promise<User | null> {
     return this._userRepository.getUserById(userId);
   }
 }

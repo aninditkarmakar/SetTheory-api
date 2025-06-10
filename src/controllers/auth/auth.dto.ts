@@ -2,6 +2,7 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { AuthProvider } from 'src/enums/AuthProvider';
 import { GetUserByIdDto } from '../user/user.dto';
 import { Type } from 'class-transformer';
+import { PartialExisting } from 'src/utilities/utilityTypes';
 
 export class SignInRequestDto {
   @IsNotEmpty()
@@ -21,13 +22,15 @@ export class SignInResponseDto {
   @Type(() => GetUserByIdDto)
   user: GetUserByIdDto;
 
-  accessToken: string;
+  access_token: string;
 
-  refreshToken?: string;
+  refresh_token?: string;
 
-  expiresIn: number;
+  expires_in: number;
 
-  constructor(partial: Partial<SignInResponseDto>) {
+  constructor(
+    partial: PartialExisting<SignInResponseDto, keyof SignInResponseDto>,
+  ) {
     Object.assign(this, partial);
   }
 }

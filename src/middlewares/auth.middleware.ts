@@ -1,10 +1,14 @@
-import { NestMiddleware, UnauthorizedException } from '@nestjs/common';
+import { Inject, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { SignInRequestDto } from 'src/controllers/auth/auth.dto';
 import { AuthProvider } from 'src/enums/AuthProvider';
-import { AuthProviderInfo, AuthService } from 'src/services/AuthService';
+import {
+  AuthProviderInfo,
+  AuthService,
+  IAuthServiceToken,
+} from 'src/services/AuthService';
 
 export type SignInRequest = Request<unknown, unknown, SignInRequestDto> & {
   providerInfo?: AuthProviderInfo;
@@ -14,7 +18,10 @@ export class SignInMiddleware implements NestMiddleware {
   private _googleClient: OAuth2Client;
 
   public constructor(
+    @Inject(ConfigService)
     private readonly _configService: ConfigService,
+
+    @Inject(IAuthServiceToken)
     private readonly _authService: AuthService,
   ) {
     this._googleClient = new OAuth2Client(

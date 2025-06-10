@@ -1,12 +1,11 @@
-import { PrismaClient } from 'prisma/generated/prisma';
+import { Prisma, PrismaClient } from 'prisma/generated/prisma';
 import { IIdentityRepository } from '../IIdentityRepository';
 import {
   IPrismaClientProvider,
   IPrismaClientProviderToken,
 } from 'src/services/PrismaClientService';
-import { IdentityModel } from 'src/models/IdentityModel';
 import { Inject } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
+import { AuthProvider } from 'src/enums/AuthProvider';
 
 export class IdentityRepository implements IIdentityRepository {
   private readonly _prisma: PrismaClient;
@@ -17,10 +16,14 @@ export class IdentityRepository implements IIdentityRepository {
     this._prisma = prismaProvider.getPrismaClient();
   }
 
-  public async getIdentity(providerId: string): Promise<IdentityModel | null> {
+  public async getIdentity(
+    providerId: string,
+    authProvider: AuthProvider,
+  ): Promise<Prisma.IdentityGetPayload<{ include: { user: true } }> | null> {
     const dbIdentity = await this._prisma.identity.findFirst({
       where: {
         provider_id: providerId,
+        auth_provider: authProvider,
       },
       include: {
         user: true,
@@ -31,6 +34,6 @@ export class IdentityRepository implements IIdentityRepository {
       return null;
     }
 
-    return plainToInstance(IdentityModel, dbIdentity);
+    return dbIdentity;
   }
 }
