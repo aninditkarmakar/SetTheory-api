@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {
@@ -11,13 +11,24 @@ import { IIdentityRepositoryToken } from './repositories/IIdentityRepository';
 import { IdentityRepository } from './repositories/impl/IdentityRepository';
 import { IUserServiceToken, UserService } from './services/UserService';
 import { UserController } from './controllers/user/user.controller';
+import { SignInMiddleware } from './middlewares/auth.middleware';
+import { AuthService, IAuthServiceToken } from './services/AuthService';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import {
+  IdentityService,
+  IIdentityServiceToken,
+} from './services/IdentityService';
+import { AuthController } from './controllers/auth/auth.controller';
 
 @Module({
   imports: [],
-  controllers: [AppController, UserController],
+  controllers: [AppController, UserController, AuthController],
   providers: [
     /** SERVICES */
     AppService,
+    JwtService,
+    ConfigService,
     {
       provide: IPrismaClientProviderToken,
       useClass: PrismaClientService,
@@ -25,6 +36,14 @@ import { UserController } from './controllers/user/user.controller';
     {
       provide: IUserServiceToken,
       useClass: UserService,
+    },
+    {
+      provide: IAuthServiceToken,
+      useClass: AuthService,
+    },
+    {
+      provide: IIdentityServiceToken,
+      useClass: IdentityService,
     },
 
     // -------------------
@@ -43,4 +62,8 @@ import { UserController } from './controllers/user/user.controller';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SignInMiddleware).forRoutes('auth/sign-in');
+  }
+}
