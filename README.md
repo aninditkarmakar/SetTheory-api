@@ -4,6 +4,20 @@ SetTheory-API
 
 ## Project setup
 
+### Decrypt environment file
+
+There is an encrypted env.local.enc file in the root of the repo that was created using the command:
+
+```bash
+openssl aes-256-cbc -pbkdf2 -salt -in .env.local -out .env.local.enc
+```
+
+You will first need to decrypt the file to get the environment variables. Run the following command to decrypt:
+
+```bash
+openssl aes-256-cbc -d -pbkdf2 -in .env.local.enc -out .env.local
+```
+
 Run the following command first.
 
 ```bash
