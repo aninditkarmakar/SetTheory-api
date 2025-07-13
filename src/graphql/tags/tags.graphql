@@ -3,9 +3,15 @@ type Query {
   tag(id: ID!): Tag
 }
 
-# type Mutation {
-#   createCat(createCatInput: CreateCatInput): Cat
-# }
+input CreateTagInput {
+  name: String!
+}
+
+type Mutation {
+  # Version V0 accepts userId. The real createTag mutation should pick up the userId
+  # from the calling user's context. (e.g. from the Bearer token).
+  createTag_V0(userId: ID!, createTagInput: CreateTagInput): Tag!
+}
 
 # type Subscription {
 #   catCreated: Cat
@@ -16,8 +22,3 @@ type Tag {
   name: String!
   users: [User!]!
 }
-
-# input CreateCatInput {
-#   name: String
-#   age: Int
-# }
