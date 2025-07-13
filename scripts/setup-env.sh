@@ -1,10 +1,9 @@
 #!/bin/bash
 # This script sets DATABASE_URL in the .env file using the NEON_POSTGRES_DEV_DB_CONNECTION_STRING environment variable.
 
-if [ -z "$NEON_POSTGRES_DEV_DB_CONNECTION_STRING" ]; then
-  echo "Error: NEON_POSTGRES_DEV_DB_CONNECTION_STRING is not set."
+if [ -z "$SET_THEORY_ENCRYPTION_KEY" ]; then
+  echo "Error: SET_THEORY_ENCRYPTION_KEY is not set."
   exit 1
 fi
 
-echo "DATABASE_URL=\"$NEON_POSTGRES_DEV_DB_CONNECTION_STRING\"" > .env
-echo ".env file updated with DATABASE_URL from NEON_POSTGRES_DEV_DB_CONNECTION_STRING."
+openssl aes-256-cbc -d -pbkdf2 -in .env.local.enc -out .env.local -pass pass:$SET_THEORY_ENCRYPTION_KEY
