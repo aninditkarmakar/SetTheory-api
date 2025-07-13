@@ -16,7 +16,6 @@ export function buildPrismaSelect(selection: FieldNode): Record<string, any> {
       }
     }
   }
-  // Optionally remove debug log
-  // console.log(JSON.stringify(fields, null, 2));
+
   return fields;
 }
