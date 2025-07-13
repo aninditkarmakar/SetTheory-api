@@ -1,17 +1,30 @@
 import { Inject } from '@nestjs/common';
 import { Resolver, Query, ResolveField } from '@nestjs/graphql';
-import { IUserService } from 'src/services/UserService';
+import { PrismaClient } from 'prisma/generated/prisma';
+import {
+  IPrismaClientProvider,
+  IPrismaClientProviderToken,
+} from 'src/services/PrismaClientService';
 
 @Resolver('User')
 export class UsersResolver {
+  private readonly _prisma: PrismaClient;
+
   public constructor(
-    @Inject('IUserService') private readonly _userService: IUserService,
-  ) {}
+    @Inject(IPrismaClientProviderToken) prismaProvider: IPrismaClientProvider,
+  ) {
+    this._prisma = prismaProvider.getPrismaClient();
+  }
 
   @Query('user')
   async getUserById(parent: any, args: { id: string }) {
     console.log('Fetching user with ID:', args.id);
-    const user = await this._userService.getUserById(args.id);
+    const user = await this._prisma.user.findUnique({
+      where: {
+        id: args.id,
+      },
+    });
+
     return user;
   }
 
