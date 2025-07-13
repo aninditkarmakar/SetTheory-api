@@ -15,7 +15,7 @@ openssl aes-256-cbc -pbkdf2 -salt -in .env.local -out .env.local.enc
 You will first need to decrypt the file to get the environment variables. Run the following command to decrypt:
 
 ```bash
-openssl aes-256-cbc -d -pbkdf2 -in .env.local.enc -out .env.local
+openssl aes-256-cbc -d -pbkdf2 -in .env.local.enc -out .env
 ```
 
 Rename the file to `.env`.

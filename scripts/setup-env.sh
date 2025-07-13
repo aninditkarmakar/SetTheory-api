@@ -6,4 +6,4 @@ if [ -z "$SET_THEORY_ENCRYPTION_KEY" ]; then
   exit 1
 fi
 
-openssl aes-256-cbc -d -pbkdf2 -in .env.local.enc -out .env.local -pass pass:$SET_THEORY_ENCRYPTION_KEY
+openssl aes-256-cbc -d -pbkdf2 -in .env.local.enc -out .env -pass pass:$SET_THEORY_ENCRYPTION_KEY
