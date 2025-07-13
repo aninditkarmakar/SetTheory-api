@@ -1,10 +1,20 @@
 import { Inject } from '@nestjs/common';
-import { Resolver, Query, ResolveField } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  ResolveField,
+  Info,
+  Args,
+  Parent,
+} from '@nestjs/graphql';
+import { GraphQLResolveInfo } from 'graphql';
 import { PrismaClient } from 'prisma/generated/prisma';
 import {
   IPrismaClientProvider,
   IPrismaClientProviderToken,
 } from 'src/services/PrismaClientService';
+import { buildPrismaSelect } from 'src/utilities/buildPrismaSelect';
+import { User } from '../graphql';
 
 @Resolver('User')
 export class UsersResolver {
@@ -17,12 +27,18 @@ export class UsersResolver {
   }
 
   @Query('user')
-  async getUserById(parent: any, args: { id: string }) {
-    console.log('Fetching user with ID:', args.id);
+  async getUserById(
+    parent: any,
+    @Args('id') id: string,
+    @Info() info: GraphQLResolveInfo,
+  ) {
+    const userField = info.fieldNodes.find((f) => f.name.value === 'user');
+    const select = userField ? buildPrismaSelect(userField) : undefined;
     const user = await this._prisma.user.findUnique({
       where: {
-        id: args.id,
+        id,
       },
+      ...(select ? { select } : {}),
     });
 
     return user;
@@ -36,5 +52,23 @@ export class UsersResolver {
         name: 'Example Tag',
       },
     ]);
+  }
+
+  @ResolveField('identities')
+  async getUserIdentities(
+    @Parent() user: User,
+    @Info() info: GraphQLResolveInfo,
+  ) {
+    const identityField = info.fieldNodes.find(
+      (f) => f.name.value === 'identities',
+    );
+    const select = identityField ? buildPrismaSelect(identityField) : undefined;
+
+    return this._prisma.identity.findMany({
+      where: {
+        user_id: user.id,
+      },
+      ...(select ? { select } : {}),
+    });
   }
 }

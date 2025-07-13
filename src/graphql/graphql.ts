@@ -31,6 +31,16 @@ export class User {
     created_at: DateTime;
     modified_at: DateTime;
     tags: Tag[];
+    identities: Identity[];
+}
+
+export class Identity {
+    id: string;
+    user_id: string;
+    provider_id: string;
+    auth_provider: number;
+    created_at: DateTime;
+    user: User;
 }
 
 export type DateTime = Date;
