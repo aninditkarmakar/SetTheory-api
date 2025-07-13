@@ -20,9 +20,30 @@ import {
   IIdentityServiceToken,
 } from './services/IdentityService';
 import { AuthController } from './controllers/auth/auth.controller';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { DateTimeScalar } from './graphql/common/scalars/datetime.scalar';
+import { UsersResolver } from './graphql/users/users.resolver';
 
 @Module({
-  imports: [],
+  imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      graphiql: true,
+      typePaths: ['./**/*.graphql'],
+      definitions: {
+        // This will generate the GraphQL types in the specified path every time the application starts
+        // Alternatively, on-demand generation can be configured like so mentioned in the NestJS documentation:
+        // https://docs.nestjs.com/graphql/quick-start
+        path: join(process.cwd(), 'src/graphql/graphql.ts'),
+        outputAs: 'class',
+        customScalarTypeMapping: {
+          DateTime: 'Date',
+        },
+      },
+    }),
+  ],
   controllers: [AppController, UserController, AuthController],
   providers: [
     /** SERVICES */
@@ -60,6 +81,16 @@ import { AuthController } from './controllers/auth/auth.controller';
       provide: IIdentityRepositoryToken,
       useClass: IdentityRepository,
     },
+
+    /**
+     * GRAPHQL SCALARS
+     */
+    DateTimeScalar,
+
+    /**
+     * GRAPHQL RESOLVERS
+     */
+    UsersResolver,
   ],
 })
 export class AppModule implements NestModule {
