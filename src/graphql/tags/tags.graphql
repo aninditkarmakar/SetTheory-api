@@ -1,0 +1,23 @@
+type Query {
+  tags: [Tag!]!
+  tag(id: ID!): Tag
+}
+
+# type Mutation {
+#   createCat(createCatInput: CreateCatInput): Cat
+# }
+
+# type Subscription {
+#   catCreated: Cat
+# }
+
+type Tag {
+  id: ID!
+  name: String!
+  users: [User!]!
+}
+
+# input CreateCatInput {
+#   name: String
+#   age: Int
+# }

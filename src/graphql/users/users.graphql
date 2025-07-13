@@ -1,0 +1,28 @@
+scalar DateTime
+
+type User {
+  id: ID!
+  first_name: String!
+  last_name: String
+  email: String
+  date_of_birth: DateTime
+  created_at: DateTime!
+  modified_at: DateTime!
+  tags: [Tag!]!
+  identities: [Identity!]!
+}
+
+type Identity {
+  id: ID!
+  user_id: String!
+  provider_id: String!
+  auth_provider: Int!
+  created_at: DateTime!
+  user: User!
+}
+
+type Query {
+  # users: [User!]!
+  user(id: ID!): User
+  # usertags(userId: ID!): [Tag!]!
+}
