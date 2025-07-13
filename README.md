@@ -54,3 +54,13 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+
+## GraphQL Playground
+
+Run the app:
+
+```bash
+npm run start:dev
+```
+
+Go to http://localhost:4000/graphql for the playground
