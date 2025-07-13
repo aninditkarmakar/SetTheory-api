@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "prisma-db-pull": "dotenv -e .env.local npx prisma db pull",
+    "prisma-db-pull": "dotenv -e .env npx prisma db pull",
     "prisma-generate": "npx prisma generate",
     "start": "nest start",
     "start:dev": "nest start --watch",

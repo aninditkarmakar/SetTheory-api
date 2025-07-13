@@ -28,6 +28,6 @@ jobs:
           node-version: 24.0.2
           cache: 'npm'
       - run: npm install
-      - run: npx prisma db pull
-      - run: npx prisma generate
+      - run: npm run prisma-db-pull
+      - run: npm run prisma-generate
       - run: npm run build
