@@ -47,6 +47,27 @@ model Identity {
   @@map("identity")
 }
 
+model Tag {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String     @unique @db.VarChar(50)
+  created_at DateTime   @default(now()) @db.Timestamp(6)
+  users      Tag_User[]
+
+  @@map("tag")
+}
+
+model Tag_User {
+  user_id    String   @db.Uuid
+  tag_id     String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  tag        Tag      @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_tag_user_tag_id")
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_tag_user_user_id")
+
+  @@id([user_id, tag_id], map: "pk_tag_user")
+
+  @@map("tag_user")
+}
+
 model User {
   id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   first_name    String     @db.VarChar(30)
@@ -56,6 +77,7 @@ model User {
   created_at    DateTime   @default(now()) @db.Timestamp(6)
   modified_at   DateTime   @default(now()) @db.Timestamp(6)
   identities    Identity[]
+  tags          Tag_User[]
 
   @@index([email], map: "idx_user_email")
   @@map("user")
