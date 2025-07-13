@@ -19,7 +19,7 @@ jobs:
 
       - name: Setup environment variables
         env:
-          NEON_POSTGRES_DEV_DB_CONNECTION_STRING: ${{ secrets.NEON_POSTGRES_DEV_DB_CONNECTION_STRING }}
+          SET_THEORY_ENCRYPTION_KEY: ${{ secrets.SET_THEORY_ENCRYPTION_KEY }}
         run: scripts/setup-env.sh
 
       - name: Build with Node 24.0.2
