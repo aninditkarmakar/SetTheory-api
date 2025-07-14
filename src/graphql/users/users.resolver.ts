@@ -1,19 +1,10 @@
 import { Inject } from '@nestjs/common';
-import {
-  Resolver,
-  Query,
-  ResolveField,
-  Info,
-  Args,
-  Parent,
-} from '@nestjs/graphql';
-import { GraphQLResolveInfo } from 'graphql';
+import { Resolver, Query, ResolveField, Args, Parent } from '@nestjs/graphql';
 import { PrismaClient } from 'prisma/generated/prisma';
 import {
   IPrismaClientProvider,
   IPrismaClientProviderToken,
 } from 'src/services/PrismaClientService';
-import { buildPrismaSelect } from 'src/utilities/buildPrismaSelect';
 import { User } from '../graphql';
 
 @Resolver('User')
@@ -27,48 +18,27 @@ export class UsersResolver {
   }
 
   @Query('user')
-  async getUserById(
-    parent: any,
-    @Args('id') id: string,
-    @Info() info: GraphQLResolveInfo,
-  ) {
-    const userField = info.fieldNodes.find((f) => f.name.value === 'user');
-    const select = userField ? buildPrismaSelect(userField) : undefined;
+  async getUserById(parent: any, @Args('id') id: string) {
     const user = await this._prisma.user.findUnique({
       where: {
         id,
       },
-      ...(select ? { select } : {}),
+      include: {
+        identities: true,
+        tags: true,
+      },
     });
 
     return user;
   }
 
   @ResolveField('tags')
-  async getUserTags() {
-    return Promise.resolve([
-      {
-        id: '1',
-        name: 'Example Tag',
-      },
-    ]);
+  async getUserTags(@Parent() user: User) {
+    return Promise.resolve(user.tags || []);
   }
 
   @ResolveField('identities')
-  async getUserIdentities(
-    @Parent() user: User,
-    @Info() info: GraphQLResolveInfo,
-  ) {
-    const identityField = info.fieldNodes.find(
-      (f) => f.name.value === 'identities',
-    );
-    const select = identityField ? buildPrismaSelect(identityField) : undefined;
-
-    return this._prisma.identity.findMany({
-      where: {
-        user_id: user.id,
-      },
-      ...(select ? { select } : {}),
-    });
+  async getUserIdentities(@Parent() user: User) {
+    return Promise.resolve(user.identities || []);
   }
 }

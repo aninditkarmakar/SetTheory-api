@@ -8,6 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "generate-gql-typings": "ts-node scripts/generateGraphQLTypings.ts",
     "prisma-db-pull": "dotenv -e .env npx prisma db pull",
     "prisma-generate": "npx prisma generate",
     "start": "nest start",

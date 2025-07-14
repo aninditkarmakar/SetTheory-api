@@ -1,23 +1,27 @@
-scalar DateTime
+scalar GraphQLISODateTime
 
 type User {
   id: ID!
   first_name: String!
   last_name: String
   email: String
-  date_of_birth: DateTime
-  created_at: DateTime!
-  modified_at: DateTime!
+  date_of_birth: GraphQLISODateTime
+  created_at: GraphQLISODateTime!
+  modified_at: GraphQLISODateTime!
   tags: [Tag!]!
   identities: [Identity!]!
+}
+
+enum AUTH_PROVIDER {
+  GOOGLE
 }
 
 type Identity {
   id: ID!
   user_id: String!
   provider_id: String!
-  auth_provider: Int!
-  created_at: DateTime!
+  auth_provider: AUTH_PROVIDER!
+  created_at: GraphQLISODateTime!
   user: User!
 }
 

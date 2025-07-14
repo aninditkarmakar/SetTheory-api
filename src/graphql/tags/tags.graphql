@@ -1,6 +1,6 @@
 type Query {
-  tags: [Tag!]!
-  tag(id: ID!): Tag
+  allTags: [Tag!]!
+  tagUsers(name: String!): Tag!
 }
 
 input CreateTagInput {

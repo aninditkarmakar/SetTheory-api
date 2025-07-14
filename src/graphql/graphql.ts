@@ -8,40 +8,59 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export abstract class IQuery {
-    abstract tags(): Tag[] | Promise<Tag[]>;
+export enum AUTH_PROVIDER {
+    GOOGLE = "GOOGLE"
+}
 
-    abstract tag(id: string): Nullable<Tag> | Promise<Nullable<Tag>>;
+export class CreateTagInput {
+    name: string;
+}
+
+export abstract class IQuery {
+    __typename?: 'IQuery';
+
+    abstract allTags(): Tag[] | Promise<Tag[]>;
+
+    abstract tagUsers(name: string): Tag | Promise<Tag>;
 
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 }
 
+export abstract class IMutation {
+    __typename?: 'IMutation';
+
+    abstract createTag_V0(userId: string, createTagInput?: Nullable<CreateTagInput>): Tag | Promise<Tag>;
+}
+
 export class Tag {
+    __typename?: 'Tag';
     id: string;
     name: string;
     users: User[];
 }
 
 export class User {
+    __typename?: 'User';
     id: string;
     first_name: string;
     last_name?: Nullable<string>;
     email?: Nullable<string>;
-    date_of_birth?: Nullable<DateTime>;
-    created_at: DateTime;
-    modified_at: DateTime;
+    date_of_birth?: Nullable<GraphQLISODateTime>;
+    created_at: GraphQLISODateTime;
+    modified_at: GraphQLISODateTime;
     tags: Tag[];
     identities: Identity[];
 }
 
 export class Identity {
+    __typename?: 'Identity';
     id: string;
     user_id: string;
     provider_id: string;
-    auth_provider: number;
-    created_at: DateTime;
+    auth_provider: AUTH_PROVIDER;
+    created_at: GraphQLISODateTime;
     user: User;
 }
 
-export type DateTime = Date;
+export type GraphQLISODateTime = any;
 type Nullable<T> = T | null;
