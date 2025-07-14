@@ -19,17 +19,21 @@ export class UsersResolver {
 
   @Query('user')
   async getUserById(parent: any, @Args('id') id: string) {
-    const user = await this._prisma.user.findUnique({
+    const dbUser = await this._prisma.user.findUnique({
       where: {
         id,
       },
       include: {
         identities: true,
-        tags: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
       },
     });
 
-    return user;
+    return dbUser;
   }
 
   @ResolveField('tags')

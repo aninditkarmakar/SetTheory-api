@@ -1,24 +1,35 @@
+##
+# QUERIES
+##
 type Query {
-  allTags: [Tag!]!
-  tagUsers(name: String!): Tag!
+  tags: [Tag!]!
+  tag(name: String!): Tag!
 }
 
+##
+# MUTATIONS AND INPUTS
+##
 input CreateTagInput {
   name: String!
 }
 
 type Mutation {
-  # Version V0 accepts userId. The real createTag mutation should pick up the userId
-  # from the calling user's context. (e.g. from the Bearer token).
-  createTag_V0(userId: ID!, createTagInput: CreateTagInput): Tag!
+  createTag(userId: ID!, createTagInput: CreateTagInput): Tag!
 }
 
-# type Subscription {
-#   catCreated: Cat
-# }
+##
+# TYPES
+##
+type TagUsersConnection {
+  edges: [TagUsersEdge]!
+}
+
+type TagUsersEdge {
+  cursor: String!
+  node: User!
+}
 
 type Tag {
   id: ID!
   name: String!
-  users: [User!]!
 }

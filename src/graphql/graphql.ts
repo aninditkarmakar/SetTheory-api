@@ -19,9 +19,9 @@ export class CreateTagInput {
 export abstract class IQuery {
     __typename?: 'IQuery';
 
-    abstract allTags(): Tag[] | Promise<Tag[]>;
+    abstract tags(): Tag[] | Promise<Tag[]>;
 
-    abstract tagUsers(name: string): Tag | Promise<Tag>;
+    abstract tag(name: string): Tag | Promise<Tag>;
 
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 }
@@ -29,14 +29,24 @@ export abstract class IQuery {
 export abstract class IMutation {
     __typename?: 'IMutation';
 
-    abstract createTag_V0(userId: string, createTagInput?: Nullable<CreateTagInput>): Tag | Promise<Tag>;
+    abstract createTag(userId: string, createTagInput?: Nullable<CreateTagInput>): Tag | Promise<Tag>;
+}
+
+export class TagUsersConnection {
+    __typename?: 'TagUsersConnection';
+    edges: Nullable<TagUsersEdge>[];
+}
+
+export class TagUsersEdge {
+    __typename?: 'TagUsersEdge';
+    cursor: string;
+    node: User;
 }
 
 export class Tag {
     __typename?: 'Tag';
     id: string;
     name: string;
-    users: User[];
 }
 
 export class User {

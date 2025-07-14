@@ -1,10 +1,11 @@
 import { Inject } from '@nestjs/common';
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PrismaClient } from 'prisma/generated/prisma';
 import {
   IPrismaClientProvider,
   IPrismaClientProviderToken,
 } from 'src/services/PrismaClientService';
+import { CreateTagDto } from './tags.dto';
 
 @Resolver('Tag')
 export class TagsResolver {
@@ -16,13 +17,42 @@ export class TagsResolver {
     this._prisma = prismaProvider.getPrismaClient();
   }
 
-  @Query('allTags')
+  @Mutation('createTag')
+  async createTagV0(
+    @Args('userId') userId: string,
+    @Args('createTagInput') createTagInput: CreateTagDto,
+  ) {
+    const { name: tagName } = createTagInput;
+    const existingTag = await this._prisma.tag.findUnique({
+      where: { name: tagName },
+    });
+    if (existingTag) {
+      throw new Error(`Tag with name ${tagName} already exists`);
+    }
+
+    const tag = await this._prisma.tag.create({
+      data: {
+        name: tagName,
+        users: {
+          create: {
+            user: {
+              connect: { id: userId },
+            },
+          },
+        },
+      },
+    });
+
+    return tag;
+  }
+
+  @Query('tags')
   async getTags() {
     const tags = await this._prisma.tag.findMany({});
     return tags;
   }
 
-  @Query('tagUsers')
+  @Query('tag')
   async getTagUsers(@Args('name') tagName: string) {
     const tag = await this._prisma.tag.findUnique({
       where: { name: tagName },
