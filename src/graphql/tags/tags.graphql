@@ -1,23 +1,41 @@
+##
+# QUERIES
+##
 type Query {
-  tags: [Tag!]!
-  tag(id: ID!): Tag
+  tags: [TagWithoutConnections!]!
+  tag(name: String!): Tag!
 }
 
-# type Mutation {
-#   createCat(createCatInput: CreateCatInput): Cat
-# }
+##
+# MUTATIONS AND INPUTS
+##
+input CreateTagInput {
+  name: String!
+}
 
-# type Subscription {
-#   catCreated: Cat
-# }
+type Mutation {
+  createTag(userId: ID!, createTagInput: CreateTagInput): Tag!
+}
+
+##
+# TYPES
+##
+type TagUsersConnection {
+  edges: [TagUsersEdge]!
+}
+
+type TagUsersEdge {
+  cursor: String!
+  node: User!
+}
 
 type Tag {
   id: ID!
   name: String!
-  users: [User!]!
+  usersConnection(take: Int, after: String): TagUsersConnection!
 }
 
-# input CreateCatInput {
-#   name: String
-#   age: Int
-# }
+type TagWithoutConnections {
+  id: ID!
+  name: String!
+}

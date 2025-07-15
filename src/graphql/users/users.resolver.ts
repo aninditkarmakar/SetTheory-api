@@ -1,20 +1,13 @@
 import { Inject } from '@nestjs/common';
-import {
-  Resolver,
-  Query,
-  ResolveField,
-  Info,
-  Args,
-  Parent,
-} from '@nestjs/graphql';
-import { GraphQLResolveInfo } from 'graphql';
+import { Resolver, Query, ResolveField, Args, Parent } from '@nestjs/graphql';
 import { PrismaClient } from 'prisma/generated/prisma';
 import {
   IPrismaClientProvider,
   IPrismaClientProviderToken,
 } from 'src/services/PrismaClientService';
-import { buildPrismaSelect } from 'src/utilities/buildPrismaSelect';
 import { User } from '../graphql';
+
+const DEFAULT_TAKE = 2;
 
 @Resolver('User')
 export class UsersResolver {
@@ -27,48 +20,56 @@ export class UsersResolver {
   }
 
   @Query('user')
-  async getUserById(
-    parent: any,
-    @Args('id') id: string,
-    @Info() info: GraphQLResolveInfo,
-  ) {
-    const userField = info.fieldNodes.find((f) => f.name.value === 'user');
-    const select = userField ? buildPrismaSelect(userField) : undefined;
-    const user = await this._prisma.user.findUnique({
+  async getUserById(parent: any, @Args('id') id: string) {
+    const dbUser = await this._prisma.user.findUnique({
       where: {
         id,
       },
-      ...(select ? { select } : {}),
+      include: {
+        identities: true,
+      },
     });
 
-    return user;
+    return dbUser;
   }
 
-  @ResolveField('tags')
-  async getUserTags() {
-    return Promise.resolve([
-      {
-        id: '1',
-        name: 'Example Tag',
+  @ResolveField('tagsConnection')
+  async getUserTags(
+    @Parent() user: User,
+    @Args('take') take: number = DEFAULT_TAKE,
+    @Args('after') after: string | null = null,
+  ) {
+    take = take > DEFAULT_TAKE ? DEFAULT_TAKE : take;
+    const findManyArgs = {
+      take,
+      where: {
+        users: {
+          some: {
+            user_id: user.id,
+          },
+        },
       },
-    ]);
+    };
+
+    if (after) {
+      findManyArgs['cursor'] = {
+        id: after,
+      };
+      findManyArgs['skip'] = 1; // Skip the cursor item
+    }
+
+    const tags = await this._prisma.tag.findMany(findManyArgs);
+
+    const edges = tags.map((tag) => ({
+      cursor: tag.id,
+      node: tag,
+    }));
+
+    return { edges };
   }
 
   @ResolveField('identities')
-  async getUserIdentities(
-    @Parent() user: User,
-    @Info() info: GraphQLResolveInfo,
-  ) {
-    const identityField = info.fieldNodes.find(
-      (f) => f.name.value === 'identities',
-    );
-    const select = identityField ? buildPrismaSelect(identityField) : undefined;
-
-    return this._prisma.identity.findMany({
-      where: {
-        user_id: user.id,
-      },
-      ...(select ? { select } : {}),
-    });
+  async getUserIdentities(@Parent() user: User) {
+    return Promise.resolve(user.identities || []);
   }
 }

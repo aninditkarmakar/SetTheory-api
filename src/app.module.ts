@@ -22,25 +22,27 @@ import {
 import { AuthController } from './controllers/auth/auth.controller';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { join } from 'path';
-import { DateTimeScalar } from './graphql/common/scalars/datetime.scalar';
 import { UsersResolver } from './graphql/users/users.resolver';
+import { TagsResolver } from './graphql/tags/tags.resolver';
+import { AuthProviderResolver } from './graphql/common/AuthProviderResolver';
+import { join } from 'path';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       graphiql: true,
-      typePaths: ['./**/*.graphql'],
+      typePaths: ['./src/graphql/**/*.graphql'],
+      resolvers: {
+        AUTH_PROVIDER: AuthProviderResolver,
+      },
       definitions: {
         // This will generate the GraphQL types in the specified path every time the application starts
         // Alternatively, on-demand generation can be configured like so mentioned in the NestJS documentation:
         // https://docs.nestjs.com/graphql/quick-start
         path: join(process.cwd(), 'src/graphql/graphql.ts'),
         outputAs: 'class',
-        customScalarTypeMapping: {
-          DateTime: 'Date',
-        },
+        emitTypenameField: true,
       },
     }),
   ],
@@ -83,14 +85,10 @@ import { UsersResolver } from './graphql/users/users.resolver';
     },
 
     /**
-     * GRAPHQL SCALARS
-     */
-    DateTimeScalar,
-
-    /**
      * GRAPHQL RESOLVERS
      */
     UsersResolver,
+    TagsResolver,
   ],
 })
 export class AppModule implements NestModule {
