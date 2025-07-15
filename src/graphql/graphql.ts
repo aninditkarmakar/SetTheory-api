@@ -19,7 +19,7 @@ export class CreateTagInput {
 export abstract class IQuery {
     __typename?: 'IQuery';
 
-    abstract tags(): Tag[] | Promise<Tag[]>;
+    abstract tags(): TagWithoutConnections[] | Promise<TagWithoutConnections[]>;
 
     abstract tag(name: string): Tag | Promise<Tag>;
 
@@ -47,6 +47,13 @@ export class Tag {
     __typename?: 'Tag';
     id: string;
     name: string;
+    usersConnection?: TagUsersConnection;
+}
+
+export class TagWithoutConnections {
+    __typename?: 'TagWithoutConnections';
+    id: string;
+    name: string;
 }
 
 export class User {
@@ -58,8 +65,19 @@ export class User {
     date_of_birth?: Nullable<GraphQLISODateTime>;
     created_at: GraphQLISODateTime;
     modified_at: GraphQLISODateTime;
-    tags: Tag[];
+    tagsConnection?: UserTagsConnection;
     identities: Identity[];
+}
+
+export class UserTagsConnection {
+    __typename?: 'UserTagsConnection';
+    edges: Nullable<UserTagsEdge>[];
+}
+
+export class UserTagsEdge {
+    __typename?: 'UserTagsEdge';
+    cursor: string;
+    node: TagWithoutConnections;
 }
 
 export class Identity {

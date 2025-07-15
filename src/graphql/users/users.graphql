@@ -1,5 +1,9 @@
 scalar GraphQLISODateTime
 
+enum AUTH_PROVIDER {
+  GOOGLE
+}
+
 type User {
   id: ID!
   first_name: String!
@@ -8,12 +12,17 @@ type User {
   date_of_birth: GraphQLISODateTime
   created_at: GraphQLISODateTime!
   modified_at: GraphQLISODateTime!
-  tags: [Tag!]!
+  tagsConnection(take: Int, after: String): UserTagsConnection!
   identities: [Identity!]!
 }
 
-enum AUTH_PROVIDER {
-  GOOGLE
+type UserTagsConnection {
+  edges: [UserTagsEdge]!
+}
+
+type UserTagsEdge {
+  cursor: String!
+  node: TagWithoutConnections!
 }
 
 type Identity {

@@ -2,7 +2,7 @@
 # QUERIES
 ##
 type Query {
-  tags: [Tag!]!
+  tags: [TagWithoutConnections!]!
   tag(name: String!): Tag!
 }
 
@@ -30,6 +30,12 @@ type TagUsersEdge {
 }
 
 type Tag {
+  id: ID!
+  name: String!
+  usersConnection(take: Int, after: String): TagUsersConnection!
+}
+
+type TagWithoutConnections {
   id: ID!
   name: String!
 }

@@ -7,6 +7,8 @@ import {
 } from 'src/services/PrismaClientService';
 import { User } from '../graphql';
 
+const DEFAULT_TAKE = 2;
+
 @Resolver('User')
 export class UsersResolver {
   private readonly _prisma: PrismaClient;
@@ -25,20 +27,45 @@ export class UsersResolver {
       },
       include: {
         identities: true,
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
       },
     });
 
     return dbUser;
   }
 
-  @ResolveField('tags')
-  async getUserTags(@Parent() user: User) {
-    return Promise.resolve(user.tags || []);
+  @ResolveField('tagsConnection')
+  async getUserTags(
+    @Parent() user: User,
+    @Args('take') take: number = DEFAULT_TAKE,
+    @Args('after') after: string | null = null,
+  ) {
+    take = take > DEFAULT_TAKE ? DEFAULT_TAKE : take;
+    const findManyArgs = {
+      take,
+      where: {
+        users: {
+          some: {
+            user_id: user.id,
+          },
+        },
+      },
+    };
+
+    if (after) {
+      findManyArgs['cursor'] = {
+        id: after,
+      };
+      findManyArgs['skip'] = 1; // Skip the cursor item
+    }
+
+    const tags = await this._prisma.tag.findMany(findManyArgs);
+
+    const edges = tags.map((tag) => ({
+      cursor: tag.id,
+      node: tag,
+    }));
+
+    return { edges };
   }
 
   @ResolveField('identities')
