@@ -13,7 +13,7 @@ import {
   IPrismaClientProviderToken,
 } from 'src/services/PrismaClientService';
 import { CreateTagDto } from './tags.dto';
-import { Tag } from '../graphql';
+import { Tag, TagUsersConnection, TagOnly } from '../graphql';
 
 const DEFAULT_TAKE = 2;
 
@@ -31,7 +31,7 @@ export class TagsResolver {
   async createTag(
     @Args('userId') userId: string,
     @Args('createTagInput') createTagInput: CreateTagDto,
-  ) {
+  ): Promise<TagOnly> {
     const { name: tagName } = createTagInput;
     const existingTag = await this._prisma.tag.findUnique({
       where: { name: tagName },
@@ -56,14 +56,56 @@ export class TagsResolver {
     return tag;
   }
 
+  @Mutation('associateTagWithUser')
+  async associateTagWithUser(
+    @Args('userId') userId: string,
+    @Args('tagId') tagId: string,
+  ): Promise<boolean> {
+    const userTagAssociation = await this._prisma.tag_User.findFirst({
+      where: {
+        user_id: userId,
+        tag_id: tagId,
+      },
+    });
+
+    if (userTagAssociation) {
+      return true;
+    }
+
+    const tag = await this._prisma.tag.findUnique({
+      where: { id: tagId },
+    });
+
+    if (!tag) {
+      throw new Error(`Tag with ID ${tagId} not found`);
+    }
+
+    const user = await this._prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new Error(`User with ID ${userId} not found`);
+    }
+
+    await this._prisma.tag_User.create({
+      data: {
+        user_id: userId,
+        tag_id: tagId,
+      },
+    });
+
+    return true;
+  }
+
   @Query('tags')
-  async getTags() {
+  async getTags(): Promise<TagOnly[]> {
     const tags = await this._prisma.tag.findMany({});
     return tags;
   }
 
   @Query('tag')
-  async getTagUsers(@Args('name') tagName: string) {
+  async getTagUsers(@Args('name') tagName: string): Promise<Tag> {
     const tag = await this._prisma.tag.findUnique({
       where: { name: tagName },
     });
@@ -80,7 +122,7 @@ export class TagsResolver {
     @Parent() tag: Tag,
     @Args('after') after: string,
     @Args('take') take: number = DEFAULT_TAKE,
-  ) {
+  ): Promise<TagUsersConnection> {
     take = take > DEFAULT_TAKE ? DEFAULT_TAKE : take; // Limit to a maximum of 2 for pagination
 
     const findManyQuery = {

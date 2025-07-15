@@ -19,17 +19,21 @@ export class CreateTagInput {
 export abstract class IQuery {
     __typename?: 'IQuery';
 
-    abstract tags(): TagWithoutConnections[] | Promise<TagWithoutConnections[]>;
+    abstract tags(): TagOnly[] | Promise<TagOnly[]>;
 
     abstract tag(name: string): Tag | Promise<Tag>;
 
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract users(): Nullable<UserOnly>[] | Promise<Nullable<UserOnly>[]>;
 }
 
 export abstract class IMutation {
     __typename?: 'IMutation';
 
-    abstract createTag(userId: string, createTagInput?: Nullable<CreateTagInput>): Tag | Promise<Tag>;
+    abstract createTag(userId: string, createTagInput?: Nullable<CreateTagInput>): TagOnly | Promise<TagOnly>;
+
+    abstract associateTagWithUser(userId: string, tagId: string): boolean | Promise<boolean>;
 }
 
 export class TagUsersConnection {
@@ -40,7 +44,7 @@ export class TagUsersConnection {
 export class TagUsersEdge {
     __typename?: 'TagUsersEdge';
     cursor: string;
-    node: User;
+    node: UserOnly;
 }
 
 export class Tag {
@@ -50,8 +54,8 @@ export class Tag {
     usersConnection?: TagUsersConnection;
 }
 
-export class TagWithoutConnections {
-    __typename?: 'TagWithoutConnections';
+export class TagOnly {
+    __typename?: 'TagOnly';
     id: string;
     name: string;
 }
@@ -69,6 +73,17 @@ export class User {
     identities: Identity[];
 }
 
+export class UserOnly {
+    __typename?: 'UserOnly';
+    id: string;
+    first_name: string;
+    last_name?: Nullable<string>;
+    email?: Nullable<string>;
+    date_of_birth?: Nullable<GraphQLISODateTime>;
+    created_at: GraphQLISODateTime;
+    modified_at: GraphQLISODateTime;
+}
+
 export class UserTagsConnection {
     __typename?: 'UserTagsConnection';
     edges: Nullable<UserTagsEdge>[];
@@ -77,7 +92,7 @@ export class UserTagsConnection {
 export class UserTagsEdge {
     __typename?: 'UserTagsEdge';
     cursor: string;
-    node: TagWithoutConnections;
+    node: TagOnly;
 }
 
 export class Identity {

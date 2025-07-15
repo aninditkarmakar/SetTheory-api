@@ -5,7 +5,7 @@ import {
   IPrismaClientProvider,
   IPrismaClientProviderToken,
 } from 'src/services/PrismaClientService';
-import { User } from '../graphql';
+import { User, UserOnly } from '../graphql';
 
 const DEFAULT_TAKE = 2;
 
@@ -31,6 +31,13 @@ export class UsersResolver {
     });
 
     return dbUser;
+  }
+
+  @Query('users')
+  async getUsers(): Promise<UserOnly[]> {
+    const users = await this._prisma.user.findMany({});
+
+    return users;
   }
 
   @ResolveField('tagsConnection')

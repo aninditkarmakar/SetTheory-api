@@ -2,7 +2,7 @@
 # QUERIES
 ##
 type Query {
-  tags: [TagWithoutConnections!]!
+  tags: [TagOnly!]!
   tag(name: String!): Tag!
 }
 
@@ -14,7 +14,8 @@ input CreateTagInput {
 }
 
 type Mutation {
-  createTag(userId: ID!, createTagInput: CreateTagInput): Tag!
+  createTag(userId: ID!, createTagInput: CreateTagInput): TagOnly!
+  associateTagWithUser(userId: ID!, tagId: ID!): Boolean!
 }
 
 ##
@@ -26,7 +27,7 @@ type TagUsersConnection {
 
 type TagUsersEdge {
   cursor: String!
-  node: User!
+  node: UserOnly!
 }
 
 type Tag {
@@ -35,7 +36,7 @@ type Tag {
   usersConnection(take: Int, after: String): TagUsersConnection!
 }
 
-type TagWithoutConnections {
+type TagOnly {
   id: ID!
   name: String!
 }
